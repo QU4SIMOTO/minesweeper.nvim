@@ -1,6 +1,6 @@
 ---@class MinesweeperCell
 ---@field _state "HIDDEN"|"SHOWN"|"FLAGGED"
----@field isMine boolean
+---@field is_mine boolean
 local MinesweeperCell = {}
 MinesweeperCell.__index = MinesweeperCell
 
@@ -8,6 +8,7 @@ MinesweeperCell.__index = MinesweeperCell
 function MinesweeperCell:new()
   return setmetatable({
     _state = "HIDDEN",
+    is_mine = false,
   }, self)
 end
 
