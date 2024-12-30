@@ -1,2 +1,3 @@
 # minesweeper.nvim
-Neovim plugin to play minesweeper
+WIP Neovim plugin to play minesweeper
+
