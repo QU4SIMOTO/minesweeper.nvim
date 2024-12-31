@@ -15,13 +15,13 @@ local grid = {
 
 local difficulty = {
   EASY = {
-    mine_ratio = 0.25,
+    mine_ratio = 0.1,
   },
   MEDIUM = {
-    mine_ratio = 0.4,
+    mine_ratio = 0.3,
   },
   HARD = {
-    mine_ratio = 0.6,
+    mine_ratio = 0.5,
   },
 }
 

@@ -1,7 +1,7 @@
 local Cell = require("minesweeper.cell")
 local default_settings = require("minesweeper.settings")
 
----@class MinesweeperGridCellIndex
+---@class MinesweeperGridCellPos
 ---@field row integer
 ---@field col integer
 
@@ -49,7 +49,7 @@ function MinesweeperGrid:new(settings)
 end
 
 ---Populate the grid cells with mines
----@param exclude? MinesweeperGridCellIndex exclude this cell when generating
+---@param exclude? MinesweeperGridCellPos exclude this cell when generating
 function MinesweeperGrid:generate_mines(exclude)
   exclude = exclude or {}
   if self._mines_generated then
@@ -68,7 +68,7 @@ function MinesweeperGrid:generate_mines(exclude)
     end
   end
 
-  for _ = 1, self.mine_count  do
+  for _ = 1, self.mine_count do
     local i = math.random(1, #possible_mine_positions)
     local pos = possible_mine_positions[i]
     local cell = self.cells[pos.row][pos.col]
@@ -77,6 +77,63 @@ function MinesweeperGrid:generate_mines(exclude)
       cell.is_mine = true
     end
   end
+
+  for i, row in ipairs(self.cells) do
+    for j, cell in ipairs(row) do
+      local adj_mines = vim
+          .iter(self:_neighbours({ row = i, col = j }))
+          :fold(0, function(acc, curr)
+            if curr.is_mine then
+              return acc + 1
+            end
+            return acc
+          end)
+      cell.adj_mines = adj_mines
+    end
+  end
+end
+
+---Get the neighbouring cells
+---@param pos MinesweeperGridCellPos
+---@return MinesweeperCell[]
+function MinesweeperGrid:_neighbours(pos)
+  assert(
+    pos.row > 0 and pos.row <= self.settings.size,
+    "Invalid row: " .. pos.row
+  )
+  assert(
+    pos.col > 0 and pos.col <= self.settings.size,
+    "Invalid col: " .. pos.col
+  )
+  return vim
+      .iter({
+        { pos.row - 1, pos.col },
+        { pos.row - 1, pos.col - 1 },
+        { pos.row,     pos.col - 1 },
+        { pos.row + 1, pos.col - 1 },
+        { pos.row + 1, pos.col },
+        { pos.row + 1, pos.col + 1 },
+        { pos.row,     pos.col + 1 },
+        { pos.row - 1, pos.col + 1 },
+      })
+      :filter(function(p)
+        return p[1] >= 1
+            and p[1] <= self.settings.size
+            and p[2] >= 1
+            and p[2] <= self.settings.size
+      end)
+      :map(function(p)
+        return self.cells[p[1]][p[2]]
+      end)
+      :totable()
+end
+
+---Have all of the empty cells been shown
+---@return boolean
+function MinesweeperGrid:is_complete()
+  return not vim.iter(self.cells):flatten():any(function(c)
+    return not c.is_mine and c._state ~= "SHOWN"
+  end)
 end
 
 return MinesweeperGrid
