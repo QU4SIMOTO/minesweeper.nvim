@@ -93,4 +93,25 @@ T["_neighbours()"] = function()
   expect.error(function() grid:_neighbours({ row = size, col = size + 1 }) end)
 end
 
+T["is_complete()"] = function()
+  local grid = Grid:new()
+  grid:generate_mines()
+
+  eq(grid:is_complete(), false)
+
+  local iter = vim.iter(grid.cells):flatten():filter(function(cell)
+    return not cell.is_mine
+  end)
+
+  local final_cell = iter:next()
+
+  for cell in iter do
+    cell:show()
+    eq(grid:is_complete(), false)
+  end
+
+  final_cell:show()
+  eq(grid:is_complete(), true)
+end
+
 return T

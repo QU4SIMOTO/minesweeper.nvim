@@ -81,13 +81,13 @@ function MinesweeperGrid:generate_mines(exclude)
   for i, row in ipairs(self.cells) do
     for j, cell in ipairs(row) do
       local adj_mines = vim
-          .iter(self:_neighbours({ row = i, col = j }))
-          :fold(0, function(acc, curr)
-            if curr.is_mine then
-              return acc + 1
-            end
-            return acc
-          end)
+        .iter(self:_neighbours({ row = i, col = j }))
+        :fold(0, function(acc, curr)
+          if curr.is_mine then
+            return acc + 1
+          end
+          return acc
+        end)
       cell.adj_mines = adj_mines
     end
   end
@@ -106,26 +106,26 @@ function MinesweeperGrid:_neighbours(pos)
     "Invalid col: " .. pos.col
   )
   return vim
-      .iter({
-        { pos.row - 1, pos.col },
-        { pos.row - 1, pos.col - 1 },
-        { pos.row,     pos.col - 1 },
-        { pos.row + 1, pos.col - 1 },
-        { pos.row + 1, pos.col },
-        { pos.row + 1, pos.col + 1 },
-        { pos.row,     pos.col + 1 },
-        { pos.row - 1, pos.col + 1 },
-      })
-      :filter(function(p)
-        return p[1] >= 1
-            and p[1] <= self.settings.size
-            and p[2] >= 1
-            and p[2] <= self.settings.size
-      end)
-      :map(function(p)
-        return self.cells[p[1]][p[2]]
-      end)
-      :totable()
+    .iter({
+      { pos.row - 1, pos.col },
+      { pos.row - 1, pos.col - 1 },
+      { pos.row, pos.col - 1 },
+      { pos.row + 1, pos.col - 1 },
+      { pos.row + 1, pos.col },
+      { pos.row + 1, pos.col + 1 },
+      { pos.row, pos.col + 1 },
+      { pos.row - 1, pos.col + 1 },
+    })
+    :filter(function(p)
+      return p[1] >= 1
+        and p[1] <= self.settings.size
+        and p[2] >= 1
+        and p[2] <= self.settings.size
+    end)
+    :map(function(p)
+      return self.cells[p[1]][p[2]]
+    end)
+    :totable()
 end
 
 ---Have all of the empty cells been shown
