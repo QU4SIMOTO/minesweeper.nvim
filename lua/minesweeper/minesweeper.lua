@@ -41,7 +41,10 @@ function Minesweeper:open_ui()
   vim.api.nvim_create_autocmd("BufLeave", {
     buffer = self.ui.buf,
     callback = function()
-      pcall(vim.api.nvim_del_autocmd, auto.group)
+      vim.api.nvim_clear_autocmds({
+        event = "User",
+        group = auto.group,
+      })
       self.ui:close()
     end,
   })

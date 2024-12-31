@@ -34,7 +34,7 @@ function MinesweeperGrid:new(settings)
 
   local total_cells = math.pow(settings.size, 2)
   local mine_ratio = default_settings.difficulty[settings.difficulty].mine_ratio
-  assert(mine_ratio < 1, "Mine ratio must be a valid ratio")
+  assert(mine_ratio > 0 and mine_ratio < 1, "Mine ratio must be a valid ratio")
 
   local mine_count = math.floor(total_cells * mine_ratio)
 

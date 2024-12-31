@@ -78,10 +78,9 @@ end
 ---Toggles the cell flag
 ---@param pos MinesweeperGridCellPos
 function MinesweeperGame:flag_cell(pos)
-  if self.state ~= "RUNNING" then
-    return
+  if self.state == "RUNNING" then
+    self.grid.cells[pos.row][pos.col]:toggle_flag()
   end
-  self.grid.cells[pos.row][pos.col]:toggle_flag()
 end
 
 return MinesweeperGame

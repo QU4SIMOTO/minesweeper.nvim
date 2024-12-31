@@ -61,7 +61,6 @@ function MinesweeperUI:close()
     return
   end
   vim.api.nvim_win_close(self.win, true)
-  pcall(vim.api.nvim_del_autocmd, auto.group)
   self.win = -1
 end
 
@@ -73,6 +72,7 @@ end
 ---Render the UI
 ---@param cells MinesweeperCell[][]
 function MinesweeperUI:render(cells)
+  vim.api.nvim_set_option_value("modifiable", true, { buf = self.buf })
   if not vim.api.nvim_buf_is_valid(self.buf) then
     return
   end
@@ -86,6 +86,7 @@ function MinesweeperUI:render(cells)
     table.insert(lines, vim.iter(line):join(""))
   end
   vim.api.nvim_buf_set_lines(self.buf, 0, -1, true, lines)
+  vim.api.nvim_set_option_value("modifiable", false, { buf = self.buf })
 end
 
 ---Set the keymaps for the UI buffer
