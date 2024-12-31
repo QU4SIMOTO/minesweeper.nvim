@@ -81,9 +81,9 @@ function MinesweeperGrid:generate_mines(exclude)
   for i, row in ipairs(self.cells) do
     for j, cell in ipairs(row) do
       local adj_mines = vim
-        .iter(self:_neighbours({ row = i, col = j }))
+        .iter(self:neighbours({ row = i, col = j }))
         :fold(0, function(acc, curr)
-          if curr.is_mine then
+          if curr.cell.is_mine then
             return acc + 1
           end
           return acc
@@ -93,10 +93,14 @@ function MinesweeperGrid:generate_mines(exclude)
   end
 end
 
+---@class MinesweeperGridNeighbour
+---@field cell MinesweeperCell
+---@field pos MinesweeperGridCellPos
+
 ---Get the neighbouring cells
 ---@param pos MinesweeperGridCellPos
----@return MinesweeperCell[]
-function MinesweeperGrid:_neighbours(pos)
+---@return MinesweeperGridNeighbour[]
+function MinesweeperGrid:neighbours(pos)
   assert(
     pos.row > 0 and pos.row <= self.settings.size,
     "Invalid row: " .. pos.row
@@ -123,7 +127,10 @@ function MinesweeperGrid:_neighbours(pos)
         and p[2] <= self.settings.size
     end)
     :map(function(p)
-      return self.cells[p[1]][p[2]]
+      return {
+        pos = { row = p[1], col = p[2] },
+        cell = self.cells[p[1]][p[2]],
+      }
     end)
     :totable()
 end
@@ -132,7 +139,7 @@ end
 ---@return boolean
 function MinesweeperGrid:is_complete()
   return not vim.iter(self.cells):flatten():any(function(c)
-    return not c.is_mine and c._state ~= "SHOWN"
+    return not c.is_mine and c.state ~= "SHOWN"
   end)
 end
 

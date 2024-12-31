@@ -3,11 +3,11 @@ local auto = require("minesweeper.auto")
 ---@param cell MinesweeperCell
 ---@return string
 local function get_cell_char(cell)
-  if cell._state == "FLAGGED" then
+  if cell.state == "FLAGGED" then
     return "f"
   end
 
-  if cell._state == "HIDDEN" then
+  if cell.state == "HIDDEN" then
     return " "
   end
   if cell.is_mine then

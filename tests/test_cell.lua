@@ -16,25 +16,25 @@ T["new()"] = new_set()
 T["toggle_flag()"] = new_set()
 
 T["new()"]["state is HIDDEN"] = function ()
-  eq(cell._state, "HIDDEN")
+  eq(cell.state, "HIDDEN")
 end
 
 T["toggle_flag()"]["HIDDEN"] = function()
-  cell._state = "HIDDEN"
+  cell.state = "HIDDEN"
   eq(cell:toggle_flag(), true)
-  eq(cell._state, "FLAGGED")
+  eq(cell.state, "FLAGGED")
 end
 
 T["toggle_flag()"]["FLAGGED"] = function()
-  cell._state = "FLAGGED"
+  cell.state = "FLAGGED"
   eq(cell:toggle_flag(), true)
-  eq(cell._state, "HIDDEN")
+  eq(cell.state, "HIDDEN")
 end
 
 T["toggle_flag()"]["SHOWN"] = function()
-  cell._state = "SHOWN"
+  cell.state = "SHOWN"
   eq(cell:toggle_flag(), false)
-  eq(cell._state, "SHOWN")
+  eq(cell.state, "SHOWN")
 end
 
 return T

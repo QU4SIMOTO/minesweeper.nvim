@@ -75,22 +75,22 @@ T["generate_mines()"]["exclude"] = function()
   end), true)
 end
 
-T["_neighbours()"] = function()
+T["neighbours()"] = function()
   local size = 10
   local grid = Grid:new({ size = size })
 
-  eq(#grid:_neighbours({ row = 1, col = 1 }), 3)
-  eq(#grid:_neighbours({ row = 2, col = 1 }), 5)
-  eq(#grid:_neighbours({ row = 1, col = 2 }), 5)
-  eq(#grid:_neighbours({ row = 2, col = 2 }), 8)
-  eq(#grid:_neighbours({ row = size, col = size }), 3)
-  eq(#grid:_neighbours({ row = size - 1, col = size }), 5)
-  eq(#grid:_neighbours({ row = size, col = size - 1 }), 5)
+  eq(#grid:neighbours({ row = 1, col = 1 }), 3)
+  eq(#grid:neighbours({ row = 2, col = 1 }), 5)
+  eq(#grid:neighbours({ row = 1, col = 2 }), 5)
+  eq(#grid:neighbours({ row = 2, col = 2 }), 8)
+  eq(#grid:neighbours({ row = size, col = size }), 3)
+  eq(#grid:neighbours({ row = size - 1, col = size }), 5)
+  eq(#grid:neighbours({ row = size, col = size - 1 }), 5)
 
-  expect.error(function() grid:_neighbours({ row = 0, col = 1 }) end)
-  expect.error(function() grid:_neighbours({ row = 1, col = 0 }) end)
-  expect.error(function() grid:_neighbours({ row = size + 1, col = 1 }) end)
-  expect.error(function() grid:_neighbours({ row = size, col = size + 1 }) end)
+  expect.error(function() grid:neighbours({ row = 0, col = 1 }) end)
+  expect.error(function() grid:neighbours({ row = 1, col = 0 }) end)
+  expect.error(function() grid:neighbours({ row = size + 1, col = 1 }) end)
+  expect.error(function() grid:neighbours({ row = size, col = size + 1 }) end)
 end
 
 T["is_complete()"] = function()
