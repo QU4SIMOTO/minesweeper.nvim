@@ -62,7 +62,7 @@ function MinesweeperGrid:generate_mines(exclude)
   local possible_mine_positions = {}
   for i = 1, self.settings.size do
     for j = 1, self.settings.size do
-      if i ~= exclude.row or j ~= exclude.col then
+      if i ~= exclude.col or j ~= exclude.row then
         table.insert(possible_mine_positions, { col = i, row = j })
       end
     end
