@@ -38,7 +38,7 @@ end
 ---Populate the grid cells with mines
 ---@param exclude? MinesweeperGridCellPos exclude this cell when generating
 function MinesweeperGrid:generate_mines(exclude)
-  exclude = exclude or {}
+  exclude = not self.settings.seed and exclude or {}
   if self._mines_generated then
     error("Mines already generated")
   end

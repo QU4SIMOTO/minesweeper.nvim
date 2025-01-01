@@ -47,7 +47,7 @@ local Minesweeper = {}
 Minesweeper.__index = Minesweeper
 
 ---@param mode? MinesweeperMode
----@param seed? integer
+---@param seed? integer for testing
 ---@return Minesweeper
 function Minesweeper:new(mode, seed)
   local settings = get_settings(mode, seed)
@@ -114,7 +114,7 @@ function Minesweeper:flag(pos)
 end
 
 ---@param mode? MinesweeperMode
----@param seed? integer
+---@param seed? integer used for testing
 function Minesweeper:new_game(mode, seed)
   local settings = get_settings(mode, seed)
   local was_open = self.ui:is_open()
