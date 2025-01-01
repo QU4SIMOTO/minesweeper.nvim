@@ -5,13 +5,14 @@ local Cell = require("minesweeper.cell")
 ---@field col integer
 
 ---@class MinesweeperGridSettings
----@field size integer
----@field mine_count integer
+---@field size integer Size of the grid
+---@field mine_count integer Total number of mines to generate
+---@field seed? integer Use fixed seed to generate mines
 
 ---@class MinesweeperGrid
 ---@field cells MinesweeperCell[][]
 ---@field settings MinesweeperGridSettings
----@field _mines_generated boolean
+---@field _mines_generated boolean Have the mines been generated yet
 local MinesweeperGrid = {}
 MinesweeperGrid.__index = MinesweeperGrid
 
@@ -43,7 +44,7 @@ function MinesweeperGrid:generate_mines(exclude)
   end
   self._mines_generated = true
 
-  math.randomseed(os.time())
+  math.randomseed(self.settings.seed or os.time())
 
   local possible_mine_positions = {}
   for i = 1, self.settings.size do
@@ -83,7 +84,7 @@ end
 ---@field cell MinesweeperCell
 ---@field pos MinesweeperGridCellPos
 
----Get the neighbouring cells
+---Get the neighbouring cells of a particular cell
 ---@param pos MinesweeperGridCellPos
 ---@return MinesweeperGridNeighbour[]
 function MinesweeperGrid:neighbours(pos)
@@ -127,6 +128,20 @@ function MinesweeperGrid:is_complete()
   return not vim.iter(self.cells):flatten():any(function(c)
     return not c.is_mine and c.state ~= "SHOWN"
   end)
+end
+
+---For debugging and testing
+---@return [string] representation of the cells
+function MinesweeperGrid:_dbg()
+  return vim.iter(self.cells):map(function(row)
+    return vim.iter(row):map(function(cell)
+      if cell.is_mine then
+        return "x"
+      else
+        return string.format("%d", cell.adj_mines)
+      end
+    end):join("")
+  end):totable()
 end
 
 return MinesweeperGrid

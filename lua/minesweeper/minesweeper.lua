@@ -44,9 +44,10 @@ end
 local Minesweeper = {}
 Minesweeper.__index = Minesweeper
 
+---@param settings? MinesweeperSettings
 ---@return Minesweeper
-function Minesweeper:new()
-  local settings = get_settings()
+function Minesweeper:new(settings)
+  settings = settings or get_settings()
   return setmetatable({
     game = Game:new(settings.game),
     ui = UI:new(settings.ui),
@@ -56,11 +57,10 @@ end
 ---@param event MinesweeperUIEvent
 function Minesweeper:handle_ui_event(event)
   if event.action == "SHOW" then
-    self.game:show_cell(event.pos)
+    self:show(event.pos)
   elseif event.action == "FLAG" then
-    self.game:flag_cell(event.pos)
+    self:flag(event.pos)
   end
-  self.ui:render(self.game:get_cells())
 end
 
 ---Open the ui and setup event listener
@@ -96,6 +96,18 @@ function Minesweeper:toggle_ui()
   else
     self:open_ui()
   end
+end
+
+---@param pos MinesweeperGridCellPos
+function Minesweeper:show(pos)
+  self.game:show_cell(pos)
+  self.ui:render(self.game:get_cells())
+end
+
+---@param pos MinesweeperGridCellPos
+function Minesweeper:flag(pos)
+  self.game:flag_cell(pos)
+  self.ui:render(self.game:get_cells())
 end
 
 return Minesweeper

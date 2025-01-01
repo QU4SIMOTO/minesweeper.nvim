@@ -19,7 +19,6 @@ function MinesweeperGame:new(settings)
     grid = Grid:new(settings.grid),
     has_shown = false,
     state = "RUNNING",
-    is_over = false,
   }, self)
 end
 
