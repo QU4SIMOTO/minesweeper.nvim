@@ -8,8 +8,9 @@ local UI = require("minesweeper.ui")
 ---@field ui MinesweeperUISettings
 
 ---@param mode? MinesweeperMode
+---@param seed? integer
 ---@return MinesweeperSettings
-local function get_settings(mode)
+local function get_settings(mode, seed)
   local config = Config.get()
   mode = mode or config.default_mode
   local settings = config.modes[mode]
@@ -30,6 +31,7 @@ local function get_settings(mode)
       grid = {
         size = settings.size,
         mine_count = mine_count,
+        seed = seed,
       },
     },
     ui = {
@@ -44,10 +46,11 @@ end
 local Minesweeper = {}
 Minesweeper.__index = Minesweeper
 
----@param settings? MinesweeperSettings
+---@param mode? MinesweeperMode
+---@param seed? integer
 ---@return Minesweeper
-function Minesweeper:new(settings)
-  settings = settings or get_settings()
+function Minesweeper:new(mode, seed)
+  local settings = get_settings(mode, seed)
   return setmetatable({
     game = Game:new(settings.game),
     ui = UI:new(settings.ui),
@@ -108,6 +111,19 @@ end
 function Minesweeper:flag(pos)
   self.game:flag_cell(pos)
   self.ui:render(self.game:get_cells())
+end
+
+---@param mode? MinesweeperMode
+---@param seed? integer
+function Minesweeper:new_game(mode, seed)
+  local settings = get_settings(mode, seed)
+  local was_open = self.ui:is_open()
+  self:close_ui()
+  self.game = Game:new(settings.game)
+  self.ui = UI:new(settings.ui)
+  if was_open then
+    self:open_ui()
+  end
 end
 
 return Minesweeper

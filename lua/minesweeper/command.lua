@@ -7,6 +7,22 @@ local default_key = "toggle"
 
 ---@type table<string, MinesweeperSubcommand>
 M.subcommand_tbl = {
+  new = {
+    impl = function(args)
+      if #args > 2 then
+        vim.notify("Minesweeper new: too many arguments", vim.log.levels.ERROR)
+        return
+      end
+      if args[2] and args[2]:match("%D") then
+        vim.notify(
+          "Minesweeper new: seed argument must be and integer",
+          vim.log.levels.ERROR
+        )
+        return
+      end
+      require("minesweeper"):new_game(args[1], args[2] and tonumber(args[2]))
+    end,
+  },
   toggle = {
     impl = function(args)
       if #args > 0 then

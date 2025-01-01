@@ -133,15 +133,21 @@ end
 ---For debugging and testing
 ---@return [string] representation of the cells
 function MinesweeperGrid:_dbg()
-  return vim.iter(self.cells):map(function(row)
-    return vim.iter(row):map(function(cell)
-      if cell.is_mine then
-        return "x"
-      else
-        return string.format("%d", cell.adj_mines)
-      end
-    end):join("")
-  end):totable()
+  return vim
+    .iter(self.cells)
+    :map(function(row)
+      return vim
+        .iter(row)
+        :map(function(cell)
+          if cell.is_mine then
+            return "x"
+          else
+            return string.format("%d", cell.adj_mines)
+          end
+        end)
+        :join("")
+    end)
+    :totable()
 end
 
 return MinesweeperGrid
