@@ -20,17 +20,20 @@ end
 ---@field grid MinesweeperGrid
 ---@field buf? integer
 ---@field win? integer
----@field settings any
+---@field config any
 local MinesweeperUI = {}
 MinesweeperUI.__index = MinesweeperUI
 
----@param settings any
+---@class MinesweeperUISettings
+---@field size integer
+
+---@param settings MinesweeperUISettings
 ---@return MinesweeperUI
 function MinesweeperUI:new(settings)
   return setmetatable({
     buf = -1,
     win = -1,
-    settings = {
+    config = {
       win = {
         title = "Minesweeper",
         relative = "editor",
@@ -51,7 +54,7 @@ function MinesweeperUI:open()
   if not vim.api.nvim_buf_is_valid(self.buf) then
     self.buf = vim.api.nvim_create_buf(false, true)
   end
-  self.win = vim.api.nvim_open_win(self.buf, true, self.settings.win)
+  self.win = vim.api.nvim_open_win(self.buf, true, self.config.win)
   self:set_keymaps()
 end
 

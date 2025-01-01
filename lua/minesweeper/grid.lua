@@ -1,14 +1,16 @@
 local Cell = require("minesweeper.cell")
-local default_settings = require("minesweeper.settings")
 
 ---@class MinesweeperGridCellPos
 ---@field row integer
 ---@field col integer
 
+---@class MinesweeperGridSettings
+---@field size integer
+---@field mine_count integer
+
 ---@class MinesweeperGrid
 ---@field cells MinesweeperCell[][]
 ---@field settings MinesweeperGridSettings
----@field mine_count integer
 ---@field _mines_generated boolean
 local MinesweeperGrid = {}
 MinesweeperGrid.__index = MinesweeperGrid
@@ -16,35 +18,19 @@ MinesweeperGrid.__index = MinesweeperGrid
 ---Instantiate the grid without the mines generated.
 ---This allows the mines to be generated after the user has shown at
 ---least one cell so that the game does not imediatly end when a cell is selected
----@param settings? MinesweeperGridSettings
+---@param settings MinesweeperGridSettings
 ---@return MinesweeperGrid
 function MinesweeperGrid:new(settings)
-  settings = settings or {}
-  settings.size = settings.size or default_settings.grid.size
-  settings.difficulty = settings.difficulty or default_settings.grid.difficulty
-
   local cells = {}
   for i = 1, settings.size do
     cells[i] = {}
-
     for j = 1, settings.size do
       cells[i][j] = Cell:new()
     end
   end
-
-  local total_cells = math.pow(settings.size, 2)
-  local mine_ratio = default_settings.difficulty[settings.difficulty].mine_ratio
-  assert(mine_ratio > 0 and mine_ratio < 1, "Mine ratio must be a valid ratio")
-
-  local mine_count = math.floor(total_cells * mine_ratio)
-
-  --- Must have at least one empty cell
-  assert(mine_count < total_cells)
-
   return setmetatable({
     settings = settings,
     cells = cells,
-    mine_count = mine_count,
   }, self)
 end
 
@@ -68,7 +54,7 @@ function MinesweeperGrid:generate_mines(exclude)
     end
   end
 
-  for _ = 1, self.mine_count do
+  for _ = 1, self.settings.mine_count do
     local i = math.random(1, #possible_mine_positions)
     local pos = possible_mine_positions[i]
     local cell = self.cells[pos.row][pos.col]

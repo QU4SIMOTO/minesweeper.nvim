@@ -1,6 +1,42 @@
+local Config = require("minesweeper.config")
 local auto = require("minesweeper.auto")
 local Game = require("minesweeper.game")
 local UI = require("minesweeper.ui")
+
+---@class MinesweeperSettings
+---@field game MinesweeperGameSettings
+---@field ui MinesweeperUISettings
+
+---@param mode? MinesweeperMode
+---@return MinesweeperSettings
+local function get_settings(mode)
+  local config = Config.get()
+  mode = mode or config.default_mode
+  local settings = config.modes[mode]
+  if not settings then
+    error("Invalid mode")
+  end
+  local total_cells = math.pow(settings.size, 2)
+
+  assert(
+    settings.mine_ratio > 0 and settings.mine_ratio < 1,
+    "Mine ratio must be a valid ratio"
+  )
+  local mine_count = math.floor(total_cells * settings.mine_ratio)
+  assert(mine_count < total_cells, "There must be at least one empty cell")
+
+  return {
+    game = {
+      grid = {
+        size = settings.size,
+        mine_count = mine_count,
+      },
+    },
+    ui = {
+      size = settings.size,
+    },
+  }
+end
 
 ---@class Minesweeper
 ---@field game MinesweeperGame
@@ -10,10 +46,10 @@ Minesweeper.__index = Minesweeper
 
 ---@return Minesweeper
 function Minesweeper:new()
-  local game = Game:new()
+  local settings = get_settings()
   return setmetatable({
-    game = game,
-    ui = UI:new({ size = game.grid.settings.size }),
+    game = Game:new(settings.game),
+    ui = UI:new(settings.ui),
   }, self)
 end
 

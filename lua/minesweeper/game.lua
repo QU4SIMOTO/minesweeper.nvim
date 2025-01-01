@@ -1,5 +1,8 @@
 local Grid = require("minesweeper.grid")
 
+---@class MinesweeperGameSettings
+---@field grid MinesweeperGridSettings
+
 ---@alias MinesweeperGameState "RUNNING"|"WON"|"LOST"
 
 ---@class MinesweeperGame
@@ -9,10 +12,11 @@ local Grid = require("minesweeper.grid")
 local MinesweeperGame = {}
 MinesweeperGame.__index = MinesweeperGame
 
+---@param settings MinesweeperGameSettings
 ---@return MinesweeperGame
-function MinesweeperGame:new()
+function MinesweeperGame:new(settings)
   return setmetatable({
-    grid = Grid:new(),
+    grid = Grid:new(settings.grid),
     has_shown = false,
     state = "RUNNING",
     is_over = false,
