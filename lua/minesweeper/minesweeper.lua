@@ -104,13 +104,17 @@ end
 ---@param pos MinesweeperGridCellPos
 function Minesweeper:show(pos)
   self.game:show_cell(pos)
-  self.ui:render(self.game:get_cells())
+  if self.ui:is_open() then
+    self.ui:render(self.game:get_cells())
+  end
 end
 
 ---@param pos MinesweeperGridCellPos
 function Minesweeper:flag(pos)
   self.game:flag_cell(pos)
-  self.ui:render(self.game:get_cells())
+  if self.ui:is_open() then
+    self.ui:render(self.game:get_cells())
+  end
 end
 
 ---@param mode? MinesweeperMode
