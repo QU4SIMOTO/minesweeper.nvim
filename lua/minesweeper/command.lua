@@ -28,6 +28,24 @@ M.subcommand_tbl = {
       require("minesweeper"):toggle_ui()
     end,
   },
+  select = {
+    impl = function(args)
+      if #args < 2 then
+        vim.notify(
+          "Minesweeper select: not enough arguments",
+          vim.log.levels.ERROR
+        )
+        return
+      end
+      if #args > 2 then
+        vim.notify(
+          "Minesweeper select: too many argument",
+          vim.log.levels.ERROR
+        )
+        return
+      end
+    end,
+  },
   sweep = {
     impl = function(args)
       if #args < 2 then

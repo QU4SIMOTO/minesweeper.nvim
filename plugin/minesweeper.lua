@@ -26,3 +26,4 @@ vim.api.nvim_create_user_command("Minesweeper", command.cmd, {
   end,
   bang = false,
 })
+

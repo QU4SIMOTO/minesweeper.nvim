@@ -8,6 +8,7 @@ local Grid = require("minesweeper.grid")
 ---@class MinesweeperGame
 ---@field grid MinesweeperGrid
 ---@field state MinesweeperGameState
+---@field selected MinesweeperGridCellPos
 ---@field has_shown boolean Has at least one cell been shown
 local MinesweeperGame = {}
 MinesweeperGame.__index = MinesweeperGame
@@ -18,6 +19,7 @@ function MinesweeperGame:new(settings)
   return setmetatable({
     grid = Grid:new(settings.grid),
     has_shown = false,
+    selected = { row = 1, col = 1 },
     state = "RUNNING",
   }, self)
 end
@@ -28,19 +30,18 @@ function MinesweeperGame:get_cells()
   return self.grid.cells
 end
 
----Shows a cell and updates the game state
----@param pos MinesweeperGridCellPos
-function MinesweeperGame:show_cell(pos)
+---Shows the currently selected cell
+function MinesweeperGame:show_cell()
   if self.state ~= "RUNNING" then
     return
   end
 
   if not self.has_shown then
-    self.grid:generate_mines(pos)
+    self.grid:generate_mines(self.selected)
     self.has_shown = true
   end
 
-  local cell = self.grid.cells[pos.row][pos.col]
+  local cell = self.grid.cells[self.selected.row][self.selected.col]
 
   if not cell:show() then
     return
@@ -58,7 +59,10 @@ function MinesweeperGame:show_cell(pos)
   end
 
   if cell.adj_mines == 0 then
-    self:_show_neighbours({ cell = cell, pos = pos })
+    self:_show_neighbours({
+      cell = cell,
+      pos = self.selected,
+    })
   end
 end
 
@@ -78,11 +82,27 @@ function MinesweeperGame:_show_neighbours(neighbour)
   end
 end
 
----Toggles the cell flag
----@param pos MinesweeperGridCellPos
-function MinesweeperGame:flag_cell(pos)
+---Toggles the flag on the currently selected cell
+function MinesweeperGame:flag_cell()
   if self.state == "RUNNING" then
-    self.grid.cells[pos.row][pos.col]:toggle_flag()
+    self.grid.cells[self.selected.row][self.selected.col]:toggle_flag()
+  end
+end
+
+---@alias MinesweeperMoveDir "LEFT"|"RIGHT"|"UP"|"DOWN"
+
+---Move the selected cell in a particular direction
+---@param dir MinesweeperMoveDir
+function MinesweeperGame:move(dir)
+  local size = self.grid.settings.size
+  if dir == "LEFT" then
+    self.selected.col = math.max(self.selected.col - 1, 1)
+  elseif dir == "RIGHT" then
+    self.selected.col = math.min(self.selected.col + 1, size)
+  elseif dir == "UP" then
+    self.selected.row = math.max(self.selected.row - 1, 1)
+  elseif dir == "DOWN" then
+    self.selected.row = math.min(self.selected.row + 1, size)
   end
 end
 

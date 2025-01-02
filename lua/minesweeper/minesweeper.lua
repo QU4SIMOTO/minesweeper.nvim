@@ -57,19 +57,22 @@ function Minesweeper:new(mode, seed)
   }, self)
 end
 
----@param event MinesweeperUIEvent
-function Minesweeper:handle_ui_event(event)
-  if event.action == "SHOW" then
-    self:show(event.pos)
-  elseif event.action == "FLAG" then
-    self:flag(event.pos)
+---@param action MinesweeperUIEvent
+function Minesweeper:handle_ui_event(action)
+  if action == "SHOW" then
+    self:show()
+  elseif action == "FLAG" then
+    self:flag()
+  else
+    ---@diagnostic disable-next-line
+    self:move(action)
   end
 end
 
 ---Open the ui and setup event listener
 function Minesweeper:open_ui()
   self.ui:open()
-  self.ui:render(self.game:get_cells())
+  self:update_ui()
   vim.api.nvim_create_autocmd("User", {
     group = auto.group,
     pattern = auto.pattern,
@@ -101,19 +104,25 @@ function Minesweeper:toggle_ui()
   end
 end
 
----@param pos MinesweeperGridCellPos
-function Minesweeper:show(pos)
-  self.game:show_cell(pos)
-  if self.ui:is_open() then
-    self.ui:render(self.game:get_cells())
-  end
+---@param dir MinesweeperMoveDir
+function Minesweeper:move(dir)
+  self.game:move(dir)
+  self:update_ui()
 end
 
----@param pos MinesweeperGridCellPos
-function Minesweeper:flag(pos)
-  self.game:flag_cell(pos)
+function Minesweeper:show()
+  self.game:show_cell()
+  self:update_ui()
+end
+
+function Minesweeper:flag()
+  self.game:flag_cell()
+  self:update_ui()
+end
+
+function Minesweeper:update_ui()
   if self.ui:is_open() then
-    self.ui:render(self.game:get_cells())
+    self.ui:render(self.game:get_cells(), self.game.selected)
   end
 end
 
