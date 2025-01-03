@@ -27,19 +27,19 @@ end
 ---@return [string, string | [string]][]
 local function render_grid(grid, selected)
   return vim
-      .iter(grid.cells)
-      :enumerate()
-      :map(function(i, row)
-        return vim
-            .iter(row)
-            :enumerate()
-            :map(function(j, cell)
-              local is_selected = vim.deep_equal({ row = i, col = j }, selected)
-              return render_cell(cell, is_selected and { "selected" } or {})
-            end)
-            :totable()
-      end)
-      :totable()
+    .iter(grid.cells)
+    :enumerate()
+    :map(function(i, row)
+      return vim
+        .iter(row)
+        :enumerate()
+        :map(function(j, cell)
+          local is_selected = vim.deep_equal({ row = i, col = j }, selected)
+          return render_cell(cell, is_selected and { "selected" } or {})
+        end)
+        :totable()
+    end)
+    :totable()
 end
 
 ---@class MinesweeperUI
