@@ -103,14 +103,20 @@ function Minesweeper:select(pos)
   self:_update_ui()
 end
 
----Show the cell under the cursor
-function Minesweeper:show()
+---@param pos? MinesweeperGridCellPos
+function Minesweeper:show(pos)
+  if pos then
+    self.game:select(pos)
+  end
   self.game:show_cell()
   self:_update_ui()
 end
 
----Flag the cell under the cursor
-function Minesweeper:flag()
+---@param pos? MinesweeperGridCellPos
+function Minesweeper:flag(pos)
+  if pos then
+    self.game:select(pos)
+  end
   self.game:flag_cell()
   self:_update_ui()
 end

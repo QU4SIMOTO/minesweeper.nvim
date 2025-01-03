@@ -30,16 +30,27 @@ M.subcommand_tbl = {
   },
   select = {
     impl = function(args)
-      if #args < 2 then
+      if #args ~= 2 then
         vim.notify(
-          "Minesweeper select: not enough arguments",
+          "Minesweeper select: incorrect number of arguments2",
           vim.log.levels.ERROR
         )
         return
       end
-      if #args > 2 then
+
+      local row = tonumber(args[1])
+      local col = tonumber(args[2])
+
+      if not row then
         vim.notify(
-          "Minesweeper select: too many argument",
+          "Minesweeper select: row must be a number",
+          vim.log.levels.ERROR
+        )
+        return
+      end
+      if not col then
+        vim.notify(
+          "Minesweeper select: col must be a number",
           vim.log.levels.ERROR
         )
         return
@@ -48,15 +59,14 @@ M.subcommand_tbl = {
   },
   sweep = {
     impl = function(args)
-      if #args < 2 then
+      if #args == 0 then
+        return require("minesweeper"):show()
+      end
+      if #args ~= 2 then
         vim.notify(
-          "Minesweeper sweep: not enough arguments",
+          "Minesweeper sweep: incorrect number of arguments",
           vim.log.levels.ERROR
         )
-        return
-      end
-      if #args > 2 then
-        vim.notify("Minesweeper sweep: too many argument", vim.log.levels.ERROR)
         return
       end
       local row = tonumber(args[1])
@@ -76,26 +86,22 @@ M.subcommand_tbl = {
         )
         return
       end
-      local minesweeper = require("minesweeper")
-
-      minesweeper:select({
+      require("minesweeper"):show({
         row = row,
         col = col,
       })
-      minesweeper:show()
     end,
   },
   flag = {
     impl = function(args)
-      if #args < 2 then
+      if #args == 0 then
+        return require("minesweeper"):flag()
+      end
+      if #args ~= 2 then
         vim.notify(
-          "Minesweeper sweep: not enough arguments",
+          "Minesweeper flag: incorrect number of arguments",
           vim.log.levels.ERROR
         )
-        return
-      end
-      if #args > 2 then
-        vim.notify("Minesweeper sweep: too many argument", vim.log.levels.ERROR)
         return
       end
       local row = tonumber(args[1])
@@ -103,19 +109,18 @@ M.subcommand_tbl = {
 
       if not row then
         vim.notify(
-          "Minesweeper sweep: row must be a number",
+          "Minesweeper flag: row must be a number",
           vim.log.levels.ERROR
         )
         return
       end
       if not col then
         vim.notify(
-          "Minesweeper sweep: col must be a number",
+          "Minesweeper flag: col must be a number",
           vim.log.levels.ERROR
         )
         return
       end
-
       require("minesweeper"):flag({
         row = row,
         col = col,
