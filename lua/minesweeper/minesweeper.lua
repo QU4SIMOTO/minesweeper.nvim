@@ -137,7 +137,7 @@ end
 
 function Minesweeper:_update_ui()
   if self.ui:is_open() then
-    self.ui:render(self.game:get_cells(), self.game.selected)
+    self.ui:render(self.game)
   end
 end
 

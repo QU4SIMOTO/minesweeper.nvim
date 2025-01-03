@@ -22,6 +22,26 @@ local function render_cell(cell, highlights)
   return { adj .. " ", vim.list_extend({ adj }, highlights) }
 end
 
+---@param grid MinesweeperGrid
+---@param selected MinesweeperGridCellPos
+---@return [string, string | [string]][]
+local function render_grid(grid, selected)
+  return vim
+      .iter(grid.cells)
+      :enumerate()
+      :map(function(i, row)
+        return vim
+            .iter(row)
+            :enumerate()
+            :map(function(j, cell)
+              local is_selected = vim.deep_equal({ row = i, col = j }, selected)
+              return render_cell(cell, is_selected and { "selected" } or {})
+            end)
+            :totable()
+      end)
+      :totable()
+end
+
 ---@class MinesweeperUI
 ---@field grid MinesweeperGrid
 ---@field buf? integer
@@ -95,35 +115,18 @@ function MinesweeperUI:is_open()
 end
 
 ---Render the UI
----@param cells MinesweeperCell[][]
----@param selected MinesweeperGridCellPos
-function MinesweeperUI:render(cells, selected)
+---@param game MinesweeperGame
+function MinesweeperUI:render(game)
   if not vim.api.nvim_buf_is_valid(self.buf) then
     return
   end
   if self.ext_id then
     vim.api.nvim_buf_del_extmark(self.buf, Hl.ns, self.ext_id)
   end
-
-  local lines = vim.list_extend(
-    {},
-    vim
-      .iter(cells)
-      :enumerate()
-      :map(function(i, row)
-        return vim
-          .iter(row)
-          :enumerate()
-          :map(function(j, cell)
-            local is_selected = vim.deep_equal({ row = i, col = j }, selected)
-            return render_cell(cell, is_selected and { "selected" } or {})
-          end)
-          :totable()
-      end)
-      :totable()
-  )
+  local grid = game.grid
+  local lines = render_grid(game.grid, game.selected)
   self.ext_id = vim.api.nvim_buf_set_extmark(self.buf, Hl.ns, 0, 0, {
-    virt_lines = vim.list_slice(lines, 0, #cells + 1),
+    virt_lines = vim.list_slice(lines, 0, grid.settings.height + 1),
     virt_lines_leftcol = true,
   })
 end
