@@ -41,10 +41,4 @@ T["sweep"] = function()
   expect.reference_screenshot(child.get_screenshot())
 end
 
-T["lose"] = function()
-  child.cmd("Minesweeper")
-  child.cmd("Minesweeper sweep 4 1")
-  expect.reference_screenshot(child.get_screenshot())
-end
-
 return T

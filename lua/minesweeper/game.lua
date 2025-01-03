@@ -94,16 +94,31 @@ end
 ---Move the selected cell in a particular direction
 ---@param dir MinesweeperMoveDir
 function MinesweeperGame:move(dir)
-  local size = self.grid.settings.size
+  local width = self.grid.settings.width
+  local height = self.grid.settings.height
   if dir == "LEFT" then
     self.selected.col = math.max(self.selected.col - 1, 1)
   elseif dir == "RIGHT" then
-    self.selected.col = math.min(self.selected.col + 1, size)
+    self.selected.col = math.min(self.selected.col + 1, width)
   elseif dir == "UP" then
     self.selected.row = math.max(self.selected.row - 1, 1)
   elseif dir == "DOWN" then
-    self.selected.row = math.min(self.selected.row + 1, size)
+    self.selected.row = math.min(self.selected.row + 1, height)
   end
+end
+
+---Move the cursor to a particular cell
+---@param pos MinesweeperGridCellPos
+function MinesweeperGame:select(pos)
+  assert(
+    pos.row > 0 and pos.row <= self.grid.settings.height,
+    "Invalid row in position"
+  )
+  assert(
+    pos.col > 0 and pos.col <= self.grid.settings.width,
+    "Invalid col in position"
+  )
+  self.selected = pos
 end
 
 return MinesweeperGame

@@ -3,7 +3,8 @@ local M = {}
 ---@alias MinesweeperMode string
 
 ---@class MinesweeperModeConfig
----@field size integer
+---@field width integer
+---@field height integer
 ---@field mine_ratio number
 
 ---@alias MinesweeperModesConfig table<MinesweeperMode, MinesweeperModeConfig>
@@ -20,16 +21,19 @@ M.default_config = {
   ---@type MinesweeperModesConfig
   modes = {
     easy = {
-      size = 15,
+      width = 15,
+      height = 15,
       mine_ratio = 0.1,
     },
     medium = {
-      size = 25,
-      mine_ratio = 0.4,
+      width = 20,
+      height = 20,
+      mine_ratio = 0.2,
     },
     hard = {
-      size = 40,
-      mine_ratio = 0.6,
+      width = 50,
+      height = 30,
+      mine_ratio = 0.3,
     },
   },
   ---@type MinesweeperMode

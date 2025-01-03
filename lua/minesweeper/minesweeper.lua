@@ -1,7 +1,7 @@
 local Config = require("minesweeper.config")
-local auto = require("minesweeper.auto")
 local Game = require("minesweeper.game")
 local UI = require("minesweeper.ui")
+local Event = require("minesweeper.event")
 
 ---@class MinesweeperSettings
 ---@field game MinesweeperGameSettings
@@ -17,7 +17,7 @@ local function get_settings(mode, seed)
   if not settings then
     error("Invalid mode")
   end
-  local total_cells = math.pow(settings.size, 2)
+  local total_cells = settings.width * settings.height
 
   assert(
     settings.mine_ratio > 0 and settings.mine_ratio < 1,
@@ -29,13 +29,15 @@ local function get_settings(mode, seed)
   return {
     game = {
       grid = {
-        size = settings.size,
+        width = settings.width,
+        height = settings.height,
         mine_count = mine_count,
-        seed = seed,
+        _seed = seed,
       },
     },
     ui = {
-      size = settings.size,
+      width = settings.width,
+      height = settings.height,
     },
   }
 end
@@ -57,45 +59,28 @@ function Minesweeper:new(mode, seed)
   }, self)
 end
 
----@param action MinesweeperUIEvent
-function Minesweeper:handle_ui_event(action)
-  if action == "SHOW" then
-    self:show()
-  elseif action == "FLAG" then
-    self:flag()
-  else
-    ---@diagnostic disable-next-line
-    self:move(action)
-  end
-end
-
 ---Open the ui and setup event listener
 function Minesweeper:open_ui()
   self.ui:open()
-  self:update_ui()
-  vim.api.nvim_create_autocmd("User", {
-    group = auto.group,
-    pattern = auto.pattern,
-    callback = function(e)
-      self:handle_ui_event(e.data)
-    end,
-  })
+  self:_update_ui()
+  Event.add_event_listener(function(event)
+    self:_handle_event(event)
+  end)
   vim.api.nvim_create_autocmd("BufLeave", {
     buffer = self.ui.buf,
     callback = function()
-      vim.api.nvim_clear_autocmds({
-        event = "User",
-        group = auto.group,
-      })
+      Event.clear_event_listeners()
       self.ui:close()
     end,
   })
 end
 
+---Close the ui
 function Minesweeper:close_ui()
   self.ui:close()
 end
 
+---Toggle the ui
 function Minesweeper:toggle_ui()
   if self.ui:is_open() then
     self:close_ui()
@@ -104,28 +89,33 @@ function Minesweeper:toggle_ui()
   end
 end
 
+---Move the cursor
 ---@param dir MinesweeperMoveDir
 function Minesweeper:move(dir)
   self.game:move(dir)
-  self:update_ui()
+  self:_update_ui()
 end
 
+---Move the cursor to a particular cell
+---@param pos MinesweeperGridCellPos
+function Minesweeper:select(pos)
+  self.game:select(pos)
+  self:_update_ui()
+end
+
+---Show the cell under the cursor
 function Minesweeper:show()
   self.game:show_cell()
-  self:update_ui()
+  self:_update_ui()
 end
 
+---Flag the cell under the cursor
 function Minesweeper:flag()
   self.game:flag_cell()
-  self:update_ui()
+  self:_update_ui()
 end
 
-function Minesweeper:update_ui()
-  if self.ui:is_open() then
-    self.ui:render(self.game:get_cells(), self.game.selected)
-  end
-end
-
+---Start a new game
 ---@param mode? MinesweeperMode
 ---@param seed? integer used for testing
 function Minesweeper:new_game(mode, seed)
@@ -136,6 +126,25 @@ function Minesweeper:new_game(mode, seed)
   self.ui = UI:new(settings.ui)
   if was_open then
     self:open_ui()
+  end
+end
+
+function Minesweeper:_update_ui()
+  if self.ui:is_open() then
+    self.ui:render(self.game:get_cells(), self.game.selected)
+  end
+end
+
+---@param event MinesweeperEvent
+function Minesweeper:_handle_event(event)
+  if event.kind == "SHOW" then
+    self:show()
+  elseif event.kind == "FLAG" then
+    self:flag()
+  elseif event.kind == "QUIT" then
+    self:close_ui()
+  elseif event.kind == "MOVE" then
+    self:move(event.data)
   end
 end
 

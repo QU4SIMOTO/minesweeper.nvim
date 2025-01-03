@@ -5,9 +5,10 @@ local Cell = require("minesweeper.cell")
 ---@field col integer
 
 ---@class MinesweeperGridSettings
----@field size integer Size of the grid
+---@field width integer Width of the grid
+---@field height integer Height of the grid
 ---@field mine_count integer Total number of mines to generate
----@field seed? integer Use fixed seed to generate mines
+---@field _seed? integer Use fixed seed to generate mines
 
 ---@class MinesweeperGrid
 ---@field cells MinesweeperCell[][]
@@ -23,9 +24,9 @@ MinesweeperGrid.__index = MinesweeperGrid
 ---@return MinesweeperGrid
 function MinesweeperGrid:new(settings)
   local cells = {}
-  for i = 1, settings.size do
+  for i = 1, settings.height do
     cells[i] = {}
-    for j = 1, settings.size do
+    for j = 1, settings.width do
       cells[i][j] = Cell:new()
     end
   end
@@ -38,17 +39,17 @@ end
 ---Populate the grid cells with mines
 ---@param exclude? MinesweeperGridCellPos exclude this cell when generating
 function MinesweeperGrid:generate_mines(exclude)
-  exclude = not self.settings.seed and exclude or {}
+  exclude = not self.settings._seed and exclude or {}
   if self._mines_generated then
     error("Mines already generated")
   end
   self._mines_generated = true
 
-  math.randomseed(self.settings.seed or os.time())
+  math.randomseed(self.settings._seed or os.time())
 
   local possible_mine_positions = {}
-  for i = 1, self.settings.size do
-    for j = 1, self.settings.size do
+  for i = 1, self.settings.width do
+    for j = 1, self.settings.height do
       if i ~= exclude.col or j ~= exclude.row then
         table.insert(possible_mine_positions, { col = i, row = j })
       end
@@ -89,11 +90,11 @@ end
 ---@return MinesweeperGridNeighbour[]
 function MinesweeperGrid:neighbours(pos)
   assert(
-    pos.row > 0 and pos.row <= self.settings.size,
+    pos.row > 0 and pos.row <= self.settings.height,
     "Invalid row: " .. pos.row
   )
   assert(
-    pos.col > 0 and pos.col <= self.settings.size,
+    pos.col > 0 and pos.col <= self.settings.width,
     "Invalid col: " .. pos.col
   )
   return vim
@@ -109,9 +110,9 @@ function MinesweeperGrid:neighbours(pos)
     })
     :filter(function(p)
       return p[1] >= 1
-        and p[1] <= self.settings.size
+        and p[1] <= self.settings.height
         and p[2] >= 1
-        and p[2] <= self.settings.size
+        and p[2] <= self.settings.width
     end)
     :map(function(p)
       return {

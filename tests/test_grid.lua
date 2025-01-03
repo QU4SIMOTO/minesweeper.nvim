@@ -6,7 +6,8 @@ local eq = expect.equality
 
 ---@type MinesweeperGridSettings
 local settings = {
-  size = 20,
+  width = 20,
+  height = 20,
   mine_count = 5,
 }
 
@@ -34,7 +35,7 @@ T["new()"] = function()
   eq(#get_mines(grid), 0)
   eq(
     #vim.iter(grid.cells):flatten():totable(),
-    math.pow(settings.size, 2)
+    settings.width * settings.height
   )
 end
 
@@ -55,8 +56,9 @@ end
 T["generate_mines()"]["exclude"] = function()
   local exclude = { row = 1, col = 2 }
   grid = Grid:new({
-    size = settings.size,
-    mine_count = math.pow(settings.size, 2) - 1
+    width = settings.width,
+    height = settings.height,
+    mine_count = settings.width * settings.height - 1
   })
 
   eq(vim.iter(grid.cells):flatten():all(function(cell)
@@ -77,9 +79,10 @@ end
 
 T["generate_mines()"]["seeded"] = function()
   grid = Grid:new({
-    size = 10,
+    width = 10,
+    height = 10,
     mine_count = 10,
-    seed = 1,
+    _seed = 1,
   })
   grid:generate_mines()
 
@@ -99,20 +102,21 @@ end
 
 T["neighbours()"] = function()
   grid = Grid:new(settings)
-  local size = settings.size
+  local width = settings.width
+  local height = settings.height
 
   eq(#grid:neighbours({ row = 1, col = 1 }), 3)
   eq(#grid:neighbours({ row = 2, col = 1 }), 5)
   eq(#grid:neighbours({ row = 1, col = 2 }), 5)
   eq(#grid:neighbours({ row = 2, col = 2 }), 8)
-  eq(#grid:neighbours({ row = size, col = size }), 3)
-  eq(#grid:neighbours({ row = size - 1, col = size }), 5)
-  eq(#grid:neighbours({ row = size, col = size - 1 }), 5)
+  eq(#grid:neighbours({ row = height, col = width }), 3)
+  eq(#grid:neighbours({ row = height - 1, col = width }), 5)
+  eq(#grid:neighbours({ row = height, col = width - 1 }), 5)
 
   expect.error(function() grid:neighbours({ row = 0, col = 1 }) end)
   expect.error(function() grid:neighbours({ row = 1, col = 0 }) end)
-  expect.error(function() grid:neighbours({ row = size + 1, col = 1 }) end)
-  expect.error(function() grid:neighbours({ row = size, col = size + 1 }) end)
+  expect.error(function() grid:neighbours({ row = height + 1, col = 1 }) end)
+  expect.error(function() grid:neighbours({ row = height, col = width + 1 }) end)
 end
 
 T["is_complete()"] = function()

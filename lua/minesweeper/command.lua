@@ -76,11 +76,13 @@ M.subcommand_tbl = {
         )
         return
       end
+      local minesweeper = require("minesweeper")
 
-      require("minesweeper"):show({
+      minesweeper:select({
         row = row,
         col = col,
       })
+      minesweeper:show()
     end,
   },
   flag = {
